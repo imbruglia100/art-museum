@@ -1,11 +1,13 @@
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, useRouteError, isRouteErrorResponse } from 'react-router-dom';
 import harvardArt from './data/harvardArt';
 import GalleryNav from './components/GalleryNav';
-import GalleryView from './components/GalleryView/GalleryView';
+import GalleryView from './components/GalleryView';
+import ArtDescription from './components/ArtDescription';
 
 const router = createBrowserRouter([
   {
     element: <Layout />,
+    errorElement: <PageMissing />,
     children: [
       {
         path: "/",
@@ -19,8 +21,14 @@ const router = createBrowserRouter([
           </>
       },
       {
+        path:"galleries/:galleryId/art/:artId",
+        element: <ArtDescription galleries={harvardArt.records} />,
+        errorElement: <PageMissing />
+      },
+      {
         path:'galleries/:galleryId',
-        element: <GalleryView galleries={harvardArt.records} />
+        element: <GalleryView galleries={harvardArt.records} />,
+        errorElement: <PageMissing />
       },
       {
         path: "*",
@@ -43,6 +51,13 @@ function Layout() {
       </main>
     </div>
   );
+}
+
+function PageMissing() {
+  const error = useRouteError();
+  if (isRouteErrorResponse(error))
+    console.log(`${error.status} ${error.statusText} ${error.data}`);
+  return <h2>Page Not Found</h2>;
 }
 
 export default App;
